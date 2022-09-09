@@ -1,5 +1,6 @@
 import email
 import json
+import datetime
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseBadRequest, HttpResponseServerError
 
@@ -51,8 +52,20 @@ def getOneCustomer(request, id):
             cust = Customer.objects.filter(id = id).first()
             if (not cust):
                 return HttpResponseBadRequest("No existe un usuario con ese documento")
+
+            accounts = Account.objects.filter(user = id)
+            accountsData = []
+            for acc in accounts:
+                data = {"number": acc.number, "balance": float(acc.balance)}
+                accountsData.append(data)
             #print(customer)
-            data = {"id": cust.id, "firstName": cust.firstName, "lastName": cust.lastName, "email": cust.email}
+            data = {
+                "id": cust.id,
+                "firstName": cust.firstName,
+                "lastName": cust.lastName,
+                "email": cust.email,
+                "account": accountsData
+            }
             resp = HttpResponse()
             resp.headers['Content-Type'] = 'text/json'
             resp.content = json.dumps(data)
@@ -94,3 +107,55 @@ def deleteCustomer(request, id):
     else:
         return HttpResponseNotAllowed(['DELETE'], "Método inválido")
 
+# ---------------------------------------------------------------
+# Account
+# ---------------------------------------------------------------
+
+def newAccount(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            cust = Customer.objects.filter(id = data["userId"]).first()
+            if (not cust):
+                return HttpResponseBadRequest("No existe un usuario con ese documento")
+            account = Account(
+                lastChangeDate = datetime.datetime.now(),
+                user = cust
+            )
+            account.save()
+            return HttpResponse("Cuenta creada")
+        except:
+            return HttpResponseBadRequest("Error en los datos recibidos")
+    else:
+        return HttpResponseNotAllowed(['POST'], "Método inválido")
+
+def updateAccount(request, id):
+    if request.method == 'PUT':
+        try:
+            account = Account.objects.filter(number = id).first()
+            if (not account):
+                return HttpResponseBadRequest("No existe esa cuenta")
+            data = json.loads(request.body)
+            account.balance = data["balance"]
+            account.isActive = data["isActive"]
+            account.lastChangeDate = datetime.datetime.now()
+            account.save()
+            return HttpResponse("Cuenta actualizada")
+        except:
+            return HttpResponseBadRequest("Error en los datos recibidos")
+    else:
+        return HttpResponseNotAllowed(['PUT'], "Método inválido")
+
+def deleteAccount(request, id):
+    if request.method == 'DELETE':
+        try:
+            account = Account.objects.filter(number = id).first()
+            if (not account):
+                return HttpResponseBadRequest("No existe esa cuenta")
+            
+            account.delete()
+            return HttpResponse("Cuenta eliminada")
+        except:
+            return HttpResponseBadRequest("Error en los datos recibidos")
+    else:
+        return HttpResponseNotAllowed(['DELETE'], "Método inválido")
