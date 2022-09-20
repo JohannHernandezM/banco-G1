@@ -35,7 +35,11 @@ def getAllCustomers(request):
                 return HttpResponseBadRequest("No existen usuarios cargados")
             allCustData = []
             for cust in customers:
-                data = {"id": cust.id, "firstName": cust.firstName, "lastName": cust.lastName, "email": cust.email}
+                data = {"id": cust.id,
+                        "firstName": cust.firstName,
+                        "lastName": cust.lastName,
+                        "email": cust.email
+                }
                 allCustData.append(data)
             resp = HttpResponse()
             resp.headers['Content-Type'] = 'text/json'
