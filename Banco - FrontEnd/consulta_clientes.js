@@ -1,10 +1,10 @@
-//const getCustomerUrl = "http://127.0.0.1:8000/customers/";
-const getCustomerUrl = "https://mintic-banco-unal.herokuapp.com/customers/";
+//const getCustomerUrl = "http://127.0.0.1:8000/read";
+const getCustomerUrl = 'https://mintic2022-bancoproj-g1.herokuapp.com/read';
 
 let customers = [];
 
 function getCustomers() {
-    fetch(getCustomerUrl)
+   fetch(getCustomerUrl)
      .then(response => {
         if (response.ok)
           return response.text()

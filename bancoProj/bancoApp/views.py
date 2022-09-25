@@ -60,7 +60,9 @@ def getOneCustomer(request, id):
             accounts = Account.objects.filter(user = id)
             accountsData = []
             for acc in accounts:
-                data = {"number": acc.number, "balance": float(acc.balance)}
+                data = {"number": acc.number,
+                        "balance": float(acc.balance)
+                }
                 accountsData.append(data)
             #print(customer)
             data = {
